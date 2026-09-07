@@ -125,3 +125,194 @@ JavaScript → Machine Code
 ```
 as a single straightforward step. Modern V8 uses parsing, bytecode interpretation, profiling, and JIT optimization to execute JavaScript efficiently.
 
+## Callback in JavaScript / Node.js
+
+A callback is a function that is passed to another function as an argument and is called later, usually when some operation has completed.
+
+Think of it as:
+> **"Do this work, and when you're finished, call this function."**
+
+**Simple example**
+```
+function greet(name, callback) {
+  console.log("Hello " + name);
+
+  callback();
+}
+
+function done() {
+  console.log("Greeting completed");
+}
+
+greet("Piyali", done);
+```
+
+Output:
+```
+Hello Piyali
+Greeting completed
+```
+Here:
+```
+greet("Piyali", done);
+```
+done is the callback function.
+
+## Why do we need callbacks in Node.js?
+
+Node.js performs many operations asynchronously, such as:
+- Reading files
+- Database queries
+- HTTP requests
+- Timers
+- Network operations
+
+**Example:**
+```
+const fs = require("fs");
+
+fs.readFile("data.txt", "utf8", (err, data) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  console.log(data);
+});
+
+console.log("Reading started...");
+```
+**The callback:**
+```
+(err, data) => {
+   console.log(data);
+}
+```
+runs after the file-reading operation completes.
+
+**So conceptually:**
+```
+Node.js
+   │
+   │ readFile()
+   ↓
+Operating System
+   │
+   │ File I/O
+   ↓
+Operation completes
+   │
+   ↓
+Callback placed for execution
+   │
+   ↓
+Event Loop
+   │
+   ↓
+Callback executes
+```
+
+Callback vs normal function
+
+**Normal function:**
+```
+function add(a, b) {
+  return a + b;
+}
+
+const result = add(10, 20);
+```
+The function executes and returns immediately.
+
+**Callback:**
+```
+setTimeout(() => {
+  console.log("Done");
+}, 2000);
+```
+You're telling Node.js:
+```
+"Wait 2 seconds, and then call this function."
+```
+The important Node.js connection
+
+**This is where your previous V8 + Node.js diagram connects:**
+```
+JavaScript
+     ↓
+   V8
+     ↓
+Node.js Runtime
+     ↓
+Async Operation
+     ↓
+Event Loop
+     ↓
+Callback
+     ↓
+V8 executes callback
+```
+
+And this leads directly to the next important Node.js concepts:
+> **Callback → Callback Queue → Event Loop → Non-blocking I/O**
+
+## fs vs os
+
+The fs module allows Node.js to interact with files and directories.
+
+You can:
+```
+Create files
+Read files
+Write files
+Update files
+Delete files
+Rename files
+Work with directories
+```
+Import it:
+```
+const fs = require("fs");
+Read a file
+fs.readFile("data.txt", "utf8", (err, data) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  console.log(data);
+});
+```
+Notice the callback:
+```
+(err, data) => {
+   ...
+}
+```
+This is connected to what we discussed earlier about callbacks.
+
+The os module provides information about the machine/operating system on which Node.js is running.
+```
+const os = require("os");
+```
+For example:
+
+console.log(os.platform());
+console.log(os.arch());
+console.log(os.cpus());
+console.log(os.totalmem());
+console.log(os.freemem());
+console.log(os.hostname());
+
+Possible output:
+```
+win32
+x64
+[ ... CPU information ... ]
+17179869184
+8589934592
+MY-PC
+```
+
+
+
