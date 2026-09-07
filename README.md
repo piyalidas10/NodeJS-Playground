@@ -314,5 +314,217 @@ x64
 MY-PC
 ```
 
+## Mongoose in Node.js
+
+Mongoose is an ODM (Object Data Modeling) library for MongoDB and Node.js.
+
+**The easiest way to understand it:**
+```
+Node.js Application
+        │
+        ↓
+    Mongoose
+        │
+        ↓
+     MongoDB
+```
+Mongoose makes it easier to work with MongoDB from JavaScript/Node.js.
+
+### 1. Why do we need Mongoose?
+
+MongoDB is a NoSQL document database.
+
+**A MongoDB document might look like:**
+```
+{
+  "name": "Piyali",
+  "email": "piyali@example.com",
+  "age": 38
+}
+```
+Without Mongoose, you can directly use the MongoDB driver.
+
+**With Mongoose, you can define the structure of your application's data:**
+```
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  age: Number
+});
+```
+**Then create a model:**
+```
+const User = mongoose.model("User", userSchema);
+```
+Now you can work with users through the User model.
+
+### 2. Schema
+
+A Schema describes the structure and rules of your MongoDB documents.
+```
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  age: {
+    type: Number,
+    min: 18
+  }
+});
+```
+Think:
+```
+Schema
+  │
+  ├── name → String
+  ├── email → String
+  └── age → Number
+```
+
+### 3. Model
+
+A Model is created from a Schema and is used to interact with MongoDB.
+```
+const User = mongoose.model("User", userSchema);
+```
+**Now:**
+```
+User.find();
+User.findById(id);
+User.create();
+User.updateOne();
+User.deleteOne();
+```
+**The relationship is:**
+```
+Schema
+  ↓
+Model
+  ↓
+MongoDB Collection
+  ↓
+Documents
+```
+**For example:**
+```
+userSchema
+    ↓
+   User
+    ↓
+users collection
+    ↓
+┌───────────────┐
+│ Document 1    │
+│ Document 2    │
+│ Document 3    │
+└───────────────┘
+```
+
+### 4. Connecting Mongoose to MongoDB
+```
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb://localhost:27017/myapp")
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+### 5. Create a document
+```
+const user = await User.create({
+  name: "Piyali",
+  email: "piyali@example.com",
+  age: 38
+});
+```
+Mongoose takes this JavaScript object and persists it as a MongoDB document.
+
+### 6. Read documents
+```
+const users = await User.find();
+```
+**Find one:**
+```
+const user = await User.findOne({
+  email: "piyali@example.com"
+});
+```
+**Find by ID:**
+```
+const user = await User.findById(id);
+```
+
+### 7. Update
+```
+await User.updateOne(
+  { email: "piyali@example.com" },
+  { $set: { age: 39 } }
+);
+```
+Or:
+```
+await User.findByIdAndUpdate(
+  id,
+  { age: 39 },
+  { new: true }
+);
+```
+
+### 8. Delete
+```
+await User.deleteOne({
+  email: "piyali@example.com"
+});
+```
+Or:
+```
+await User.findByIdAndDelete(id);
+```
+
+### 9. Mongoose vs MongoDB Driver
+
+This is a common interview question.
+
+**MongoDB Driver**
+```
+Node.js
+   ↓
+MongoDB Driver
+   ↓
+MongoDB
+```
+You work more directly with MongoDB.
+
+**Mongoose**
+```
+Node.js
+   ↓
+Mongoose
+   ↓
+MongoDB Driver
+   ↓
+MongoDB
+```
+
+**Mongoose provides additional application-level features such as:**
+- Schemas
+- Validation
+- Models
+- Middleware/hooks
+- Query helpers
+- Population
+- Type casting
 
 
